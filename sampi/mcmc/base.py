@@ -10,7 +10,7 @@ class MCMCSampler:
 
     def __init__(self):
 
-        
+        pass
 
 
 

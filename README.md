@@ -1,2 +1,2 @@
 # sampi
-Some Monte Carlo codes.
+Some Monte Carlo and optimization codes.
