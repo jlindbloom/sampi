@@ -9,6 +9,7 @@ import scipy.sparse as sps
 import jlinops
 
 
+
 class IASSolver:
 
     def __init__(self, F, R, y, hyperparams, noise_var=None, pdata={}):
@@ -19,8 +20,7 @@ class IASSolver:
         self.noise_var = noise_var
         self.R = R
         self.hyperparams = hyperparams
-        self.pdata = pdata
-        
+    
         # Some checks
         assert self.F.shape[1] == self.R.shape[1], "Shapes of forward and regularization operators do not agree!"
        
