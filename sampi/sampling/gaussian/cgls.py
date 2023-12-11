@@ -185,7 +185,7 @@ class PriorconditionedIASGaussianSampler:
             if not priorconditioning:
                 ytilde_rand = ytilde + np.random.normal(size=ytilde.shape)
                 shift = np.random.normal(size=Rtilde.shape[0])
-                cgls_solve = jlinops.trlstsq(Ftilde, Rtilde, ytilde_rand, lam=1.0, shift=shift, initialization=x_prev, **x_update_solver_params)
+                cgls_solve = jlinops.trlstsq(Ftilde, Rtilde, ytilde_rand, lam=1.0, shift=shift, initialization=x_prev, *args, **kwargs)
             else:
                 # Solve using transformed CGLS
                 cgls_solve = jlinops.trlstsq_standard_form(Ftilde, ytilde, Rpinv=Rpinv, R=Rtilde,
