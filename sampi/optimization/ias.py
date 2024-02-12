@@ -5,6 +5,10 @@ from scipy.integrate import odeint
 from scipy.sparse.linalg import aslinearoperator
 import scipy.sparse as sps
 
+from scipy.special import gamma
+from scipy.optimize import root
+
+from fastprogress import progress_bar
 
 import jlinops
 
@@ -93,7 +97,7 @@ class IASSolver:
         
         
         # Iterate
-        for j in range(max_iters):
+        for j in progress_bar(range(max_iters)):
             
             # Update noise variance
             if self.updating_noise_var:
@@ -156,12 +160,11 @@ class IASSolver:
         
         # Whiten forward operator and data
         noise_stdev = np.sqrt(noise_var)
-        Ftilde = (1.0/noise_stdev)*self.F.T
+        Ftilde = (1.0/noise_stdev)*self.F
         ytilde = (1.0/noise_stdev)*self.y
         
         # Build Rtilde
         Rtilde = jlinops.DiagonalOperator(1.0/np.sqrt(theta)) @ self.R
-        
         # If not using priorconditioning, solve original problem using CGLS without standardizing
         if not priorconditioning:
             
@@ -306,7 +309,6 @@ class IASSolver:
 
 
 
-
     def _conditional_mode_ode_rhs(self, varphi, z, r):
         """RHS of the ODE used for updating theta.
         """
@@ -314,7 +316,6 @@ class IASSolver:
         dvarphidz = (2*z*varphi)/((2*(r**2)*((varphi)**(r+1))) + (z**2))
 
         return dvarphidz
-    
     
     
     def objective(self, x, theta, noise_var):
@@ -361,13 +362,41 @@ class IASSolver:
     
 
 
-#     def sample(self, theta, noise_var=None, method=""):
-#         """Samples the posterior conditional on fixed theta and noise variance.
-#         """
-#         if noise_var is None:
-#             assert self.noise_var is not None, "Must provide a noise variance parameter."
-#             noise_var = self.noise_var
 
-        
+
+
+def ias_parameter_switch(r_init, r_target, beta_target, vartheta_target):
+    """Finds beta and vartheta parameters.
+    """
+
+    def residual(x):
+
+        # Unpack
+        beta_init, vartheta_init = x
+
+        # first component
+        tmp = vartheta_init*np.power( beta_init - 1.5*(1.0/r_init)  ,1.0/r_init)
+        tmp2 = vartheta_target*np.power( beta_target - 1.5*(1.0/r_target), 1.0/r_target )
+        first_component = tmp - tmp2
+
+        # second component
+        tmp3 = vartheta_init*gamma(beta_init + (1.0/r_init))/gamma(beta_init)
+        tmp4 = vartheta_target*gamma(beta_target + (1.0/r_target))/gamma(beta_target)
+        second_component = tmp3 - tmp4
+
+        return np.hstack([first_component, second_component])
+    
+    sol = root(residual, [1.0,1.0])
+    assert sol.status == 1, "root finder did not converge."
+    beta_init, vartheta_init = sol.x
+
+    return beta_init, vartheta_init
+
+
+
+
+
+
+
 
 
