@@ -14,7 +14,6 @@ import jlinops
 
 
 
-
 class IASSolver:
 
     def __init__(self, F, R, y, hyperparams, noise_var=None, pdata={}):
@@ -166,7 +165,6 @@ class IASSolver:
         
         # Build Rtilde
         Rtilde = jlinops.DiagonalOperator(1.0/np.sqrt(theta)) @ self.R
-
         # If not using priorconditioning, solve original problem using CGLS without standardizing
         if not priorconditioning:
             
@@ -319,7 +317,6 @@ class IASSolver:
 
         return dvarphidz
     
-
     
     def objective(self, x, theta, noise_var):
         """Evaluates the objective function.
