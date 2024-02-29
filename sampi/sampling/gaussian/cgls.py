@@ -137,7 +137,7 @@ class PriorconditionedIASGaussianSampler:
                 raise ValueError
                 
         if self.pdata["W"] is not None:
-            self.pdata["FW_pinv"] = jlinops.QRPinvOperator( jlinops.MatrixLinearOperator(self.F.matmat(self.pdata["W"].A)) )
+            self.pdata["FWpinv"] = jlinops.QRPinvOperator( jlinops.MatrixLinearOperator(self.F.matmat(self.pdata["W"].A)) )
         
         
     def sample(self, n_samples=100, priorconditioning=True, warmstarting=False, observables=None, *args, **kwargs):
@@ -189,7 +189,7 @@ class PriorconditionedIASGaussianSampler:
             else:
                 # Solve using transformed CGLS
                 cgls_solve = jlinops.trlstsq_standard_form(Ftilde, ytilde, Rpinv=Rpinv, R=Rtilde,
-                                                           AWpinv=self.pdata["FWpinv"], lam=1.0, shift=shift, W=self.pdata["W"], initialization=x_prev, *args, **kwargs)
+                                                           AWpinv=noise_stdev*self.pdata["FWpinv"], lam=1.0, shift=shift, W=self.pdata["W"], initialization=x_prev, *args, **kwargs)
                 
             sample = cgls_solve["x"]
             if warmstarting:

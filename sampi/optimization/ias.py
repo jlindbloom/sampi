@@ -212,7 +212,7 @@ class IASSolver:
             if x_update_device == "cpu":
             
                 # Build current Rpinv operator
-                Rpinv = self.pdata["Rpinv_factory"](theta, prev_eval=self.Rpinv_prev_eval, prev_eval_t=self.Rpinv_prev_eval_t)
+                Rpinv = self.pdata["Rpinv_factory"](theta)
                 
                 # Solve using transformed CGLS
                 cgls_solve = jlinops.trlstsq_standard_form(Ftilde, ytilde, Rpinv=Rpinv, R=Rtilde,
@@ -243,7 +243,7 @@ class IASSolver:
                 prev_eval = None
                 prev_eval_t = None
                     
-                Rpinv = self.pdata["Rpinv_factory"](theta, prev_eval=prev_eval, prev_eval_t=prev_eval_t)
+                Rpinv = self.pdata["Rpinv_factory"](theta)
                 #Rpinv = self.pdata["Rpinv_factory"](theta)
 
                 print(Rpinv.Rwpinv.prev_eval)
